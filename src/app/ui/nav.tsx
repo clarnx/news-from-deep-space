@@ -1,0 +1,311 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+export default function Navbar() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(loggedIn);
+
+    const handleAuthChange = () => {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      setIsLoggedIn(loggedIn);
+    };
+
+    window.addEventListener("authChange", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("authChange", handleAuthChange);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+    window.dispatchEvent(new Event("authChange"));
+    window.location.href = "/";
+  };
+
+  const navLinks = [
+    { name: "Home", href: "/", icon: "🏠" },
+    { name: "Articles", href: "/article", icon: "📰" },
+    { name: "About Us", href: "/about", icon: "ℹ️" },
+  ];
+
+  const authLinks = isLoggedIn
+    ? [
+        { name: "Account", href: "/account", icon: "👤" },
+        { name: "Logout", href: "#", onClick: handleLogout, icon: "🚪" },
+      ]
+    : [
+        { name: "Login", href: "/login", icon: "🔐" },
+        { name: "Sign Up", href: "/signup", icon: "✍️" },
+      ];
+
+  const isActive = (path: string) => {
+    if (path === "/" && pathname === "/") return true;
+    if (path !== "/" && pathname?.startsWith(path)) return true;
+    return false;
+  };
+
+  return (
+    <>
+      <nav
+        style={{
+          backgroundColor: "#2a2a42",
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.2)",
+          padding: "1rem 0",
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          borderBottom: "1px solid rgba(187, 189, 246, 0.2)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 20px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              fontSize: "1.8rem",
+              fontWeight: "bold",
+              textDecoration: "none",
+              background: "linear-gradient(135deg, #bbbdf6 0%, #7a5980 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            NFDS
+          </Link>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "2rem",
+              alignItems: "center",
+            }}
+            className="desktop-nav"
+          >
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                style={{
+                  color: isActive(link.href) ? "#bbbdf6" : "#e0e0e0",
+                  textDecoration: "none",
+                  transition: "all 0.2s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  fontWeight: isActive(link.href) ? "600" : "400",
+                  borderBottom: isActive(link.href)
+                    ? "2px solid #bbbdf6"
+                    : "2px solid transparent",
+                  paddingBottom: "4px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#bbbdf6";
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(link.href)) {
+                    e.currentTarget.style.color = "#e0e0e0";
+                  }
+                }}
+              >
+                <span>{link.icon}</span>
+                <span>{link.name}</span>
+              </Link>
+            ))}
+
+            {authLinks.map((link) =>
+              link.onClick ? (
+                <button
+                  key={link.name}
+                  onClick={link.onClick}
+                  style={{
+                    color: "#e0e0e0",
+                    textDecoration: "none",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    fontSize: "1rem",
+                    fontFamily: "inherit",
+                    padding: "4px 0",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#bbbdf6";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "#e0e0e0";
+                  }}
+                >
+                  <span>{link.icon}</span>
+                  <span>{link.name}</span>
+                </button>
+              ) : (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  style={{
+                    color: isActive(link.href) ? "#bbbdf6" : "#e0e0e0",
+                    textDecoration: "none",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    fontWeight: isActive(link.href) ? "600" : "400",
+                    borderBottom: isActive(link.href)
+                      ? "2px solid #bbbdf6"
+                      : "2px solid transparent",
+                    paddingBottom: "4px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#bbbdf6";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive(link.href)) {
+                      e.currentTarget.style.color = "#e0e0e0";
+                    }
+                  }}
+                >
+                  <span>{link.icon}</span>
+                  <span>{link.name}</span>
+                </Link>
+              ),
+            )}
+          </div>
+
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            style={{
+              display: "none",
+              background: "none",
+              border: "none",
+              color: "white",
+              fontSize: "1.5rem",
+              cursor: "pointer",
+            }}
+            className="mobile-menu-btn"
+          >
+            {isMobileMenuOpen ? "✕" : "☰"}
+          </button>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div
+            style={{
+              display: "none",
+              flexDirection: "column",
+              padding: "1rem 20px",
+              backgroundColor: "#2a2a42",
+              borderTop: "1px solid rgba(187, 189, 246, 0.1)",
+            }}
+            className="mobile-nav"
+          >
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                style={{
+                  color: isActive(link.href) ? "#bbbdf6" : "#e0e0e0",
+                  textDecoration: "none",
+                  padding: "0.75rem 0",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  borderBottom: "1px solid rgba(187, 189, 246, 0.1)",
+                }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span>{link.icon}</span>
+                <span>{link.name}</span>
+              </Link>
+            ))}
+            {authLinks.map((link) =>
+              link.onClick ? (
+                <button
+                  key={link.name}
+                  onClick={() => {
+                    link.onClick();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  style={{
+                    color: "#e0e0e0",
+                    textDecoration: "none",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "0.75rem 0",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    fontSize: "1rem",
+                    fontFamily: "inherit",
+                    textAlign: "left",
+                    borderBottom: "1px solid rgba(187, 189, 246, 0.1)",
+                    width: "100%",
+                  }}
+                >
+                  <span>{link.icon}</span>
+                  <span>{link.name}</span>
+                </button>
+              ) : (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  style={{
+                    color: isActive(link.href) ? "#bbbdf6" : "#e0e0e0",
+                    textDecoration: "none",
+                    padding: "0.75rem 0",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    borderBottom: "1px solid rgba(187, 189, 246, 0.1)",
+                  }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>{link.icon}</span>
+                  <span>{link.name}</span>
+                </Link>
+              ),
+            )}
+          </div>
+        )}
+      </nav>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .desktop-nav {
+            display: none !important;
+          }
+          .mobile-menu-btn {
+            display: block !important;
+          }
+          .mobile-nav {
+            display: flex !important;
+          }
+        }
+      `}</style>
+    </>
+  );
+}
