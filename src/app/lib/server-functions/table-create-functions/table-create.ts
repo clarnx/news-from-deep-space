@@ -22,7 +22,7 @@ async function seedCombinedKeywords(){
     fk_keyword1 UUID NOT NULL,
     fk_keyword2 UUID NOT NULL,
     
-    type TEXT,
+    type TEXT NOT NULL,
     complecated_api_type TEXT NOT NULL, 
     link TEXT NOT NULL,
     complecated_link TEXT,
