@@ -24,9 +24,9 @@ async function seedCombinedKeywords(){
     
     type TEXT,
     complecated_api_type TEXT NOT NULL, 
-    key TEXT NOT NULL,
     link TEXT NOT NULL,
     complecated_link TEXT,
+    key TEXT,
 
     
     CONSTRAINT fk_keyword1
